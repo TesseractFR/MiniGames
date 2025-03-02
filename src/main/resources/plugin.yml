@@ -1,0 +1,4 @@
+name: MiniGames
+version: '1.0-SNAPSHOT'
+main: onl.tesseract.miniGames.MiniGames
+api-version: '1.21'
