@@ -1,4 +1,20 @@
 name: MiniGames
 version: '1.0-SNAPSHOT'
-main: onl.tesseract.miniGames.MiniGames
+main: onl.tesseract.miniGames.MiniGamesPlugin
 api-version: '1.21'
+
+commands:
+  minigames:
+    aliases: [mg]
+    usage: "/minigames"
+    description: Permet d'utiliser les minigames
+  minigamesadmin:
+    aliases: [mga]
+    usage: "/minigamesadmin"
+    description: Permet d'utiliser les minigames
+  equipment:
+    usage: "/equipment"
+  inventory:
+    usage: "/inventory"
+  log:
+    usage: "/log"
