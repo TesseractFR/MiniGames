@@ -15,7 +15,7 @@ private val defaultExplicationComponent = Component.text(" ---------", NamedText
         .appendNewline()
         .append(Component.text(" ----------", NamedTextColor.GOLD))
 
-abstract class MiniGame(val name : String) {
+abstract class MiniGame(val name: String) {
 
     private val pathFile = "$MINIGAMES_GAMES_FOLDER_NAME/$name.yaml"
     protected val TUTO_MESSAGE_KEY = "Tutorial"
@@ -46,7 +46,10 @@ abstract class MiniGame(val name : String) {
 
     }
 
-    protected abstract fun loadMaps(configuration: ConfigurationSection)
-    protected abstract fun saveMaps(createSection: ConfigurationSection)
-
+    abstract fun loadMaps(configuration: ConfigurationSection)
+    protected  fun saveMaps(createSection: ConfigurationSection){
+        for(map in maps){
+            map.value.save(createSection.createSection(map.key))
+        }
+    }
 }

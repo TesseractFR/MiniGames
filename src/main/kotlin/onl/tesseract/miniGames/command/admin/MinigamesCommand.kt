@@ -14,4 +14,8 @@ class MinigamesCommand {
         sender.sendMessage(MiniGamesPlugin.instance.miniGames.entries.toList().joinToString { "$it " })
     }
 
+    @Command
+    fun saveConfigCommand(sender:Player){
+        MiniGamesPlugin.instance.saveConfig()
+    }
 }

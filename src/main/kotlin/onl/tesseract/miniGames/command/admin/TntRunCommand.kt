@@ -20,8 +20,8 @@ class TntRunCommand {
         private val miniGame = MiniGamesPlugin.instance.miniGames[TNT_RUN_GAMES]!!
         private val maps = miniGame.maps
         @Command(playerOnly = true)
-        fun setSpawn(sender: Player){
-
+        fun setSpawn(@Argument(value = "arena", clazz= TntRunMapArguments::class) map: TntRunMap,sender: Player){
+            map.spawn = sender.location
         }
         @Command(playerOnly = true)
         fun listCommand(sender: Player){
@@ -65,6 +65,16 @@ class TntRunCommand {
         fun resetArenaCommand(@Argument(value = "arena", clazz= TntRunMapArguments::class) map: TntRunMap,
                               sender: Player){
             map.resetArena()
+        }
+
+        @Command
+        fun startCommand(@Argument(value = "arena", clazz= TntRunMapArguments::class) map: TntRunMap){
+            map.start()
+        }
+        @Command
+        fun addPlaySpawnCommand(@Argument(value = "arena", clazz= TntRunMapArguments::class) map: TntRunMap,
+                                sender: Player){
+            map.playSpawn.add(sender.location)
         }
 
     }

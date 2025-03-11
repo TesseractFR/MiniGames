@@ -22,7 +22,6 @@ class MiniGamesPlugin : JavaPlugin(), Listener {
 
     val miniGames = mutableMapOf<String, MiniGame>()
     private val players = mutableMapOf<UUID,MiniGamesPlayer>()
-    lateinit var lobby : Location
 
     override fun onEnable() {
         instance = this
@@ -52,24 +51,13 @@ class MiniGamesPlugin : JavaPlugin(), Listener {
     private fun loadConfig(){
         val file = File("$MINIGAMES_FOLDER_NAME/config.yml")
         val yaml = YamlConfiguration.loadConfiguration(file)
-        lobby = yaml.getLocation("lobby")?: Bukkit.getWorlds()[0].spawnLocation
     }
 
     override fun saveConfig(){
         val file = File("$MINIGAMES_FOLDER_NAME/config.yml")
         val yaml = YamlConfiguration.loadConfiguration(file)
-        yaml["lobby"] = lobby
+        saveMiniGames()
         yaml.save(file)
-    }
-
-
-    fun joinMiniGames(player: Player) : Boolean{
-        if(players.containsKey(player.uniqueId)){
-            return false
-        }
-        players[player.uniqueId] = MiniGamesPlayer(player)
-        player.teleport(this.lobby)
-        return true
     }
 
     @EventHandler
