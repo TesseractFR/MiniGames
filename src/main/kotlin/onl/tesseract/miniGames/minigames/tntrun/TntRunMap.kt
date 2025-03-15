@@ -12,23 +12,73 @@ import onl.tesseract.miniGames.utils.enums.ArenaState
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.World
+import org.bukkit.block.Block
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
-import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.scheduler.BukkitRunnable
+import org.bukkit.util.NumberConversions
+
+
 
 
 class TntRunMap(name: String, spawn : Location) : MiniGameMap(name, spawn) {
 
+    private lateinit var blockRemoveTask : BukkitRunnable
+
+    private fun getBlockRemoveTask(): BukkitRunnable {
+        return object : BukkitRunnable() {
+            val toRemove = mutableListOf<Block>()
+            override fun run() {
+                if(this@TntRunMap.arenaState != ArenaState.INGAME){
+                    return
+                }
+                for(block in toRemove){
+                    if(block.location in this@TntRunMap.arena)
+                        block.type = Material.AIR
+                }
+                toRemove.clear()
+                for(player in this@TntRunMap.players){
+                    toRemove.add(getBlockUnderPlayer(player.location))
+                }
+            }
+            private fun getBlockUnderPlayer(location: Location): Block {
+                val b1: Block = Location(location.world, location.x+0.3, location.y-1, location.z-0.3).block
+
+                if (b1.type !== Material.AIR) {
+                    return b1
+                }
+
+                val b2: Block = Location(location.world, location.x-0.3, location.y-1, location.z+0.3).block
+
+                if (b2.type !== Material.AIR) {
+                    return b2
+                }
+
+                val b3: Block = Location(location.world, location.x+0.3, location.y-1, location.z+0.3).block
+
+                if (b3.type !== Material.AIR) {
+                    return b3
+                }
+
+                return Location(location.world, location.x-0.3, location.y-1, location.z-0.3).block
+            }
+        }
+    }
+
+
     override fun start() {
         super.start()
         MiniGamesPlugin.instance.server.pluginManager.registerEvents(this, MiniGamesPlugin.instance)
+        blockRemoveTask = getBlockRemoveTask()
+        blockRemoveTask.runTaskTimer(MiniGamesPlugin.instance,0,5)
 
     }
 
     override fun stop() {
+        blockRemoveTask.cancel()
         super.stop()
     }
 
@@ -60,21 +110,6 @@ class TntRunMap(name: String, spawn : Location) : MiniGameMap(name, spawn) {
                 }
             }
             return map
-        }
-    }
-
-    @EventHandler
-    fun onPlayerMoveTnt(event: PlayerMoveEvent) {
-        if (arenaState == ArenaState.INGAME) {
-            if (event.player in players) {
-                val l = event.player.location.clone()
-                l.y-=1
-                object : BukkitRunnable() {
-                    override fun run() {
-                        l.block.type = Material.AIR
-                    }
-                }.runTaskLater(MiniGamesPlugin.instance, 5)
-            }
         }
     }
 

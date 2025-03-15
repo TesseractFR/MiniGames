@@ -87,7 +87,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location) : Listener {
         val lp = players.elementAt(0)
         playerScore[lp] = 1
         players.remove(lp)
-        joinSpectator(lp)
+        lp.teleport(spawn)
         broadcastTitle(Component.text("Victoire de ")
                 .append(lp.displayName())
         ,Component.empty())
@@ -96,9 +96,8 @@ abstract class MiniGameMap(val name: String, var spawn: Location) : Listener {
         object : BukkitRunnable() {
             override fun run() {
                 this@MiniGameMap.resetArena()
-                this@MiniGameMap.arenaState = ArenaState.WAITING
             }
-        }.runTaskLaterAsynchronously(MiniGamesPlugin.instance,0)
+        }.runTaskLaterAsynchronously(MiniGamesPlugin.instance,10)
 
     }
 
@@ -156,6 +155,9 @@ abstract class MiniGameMap(val name: String, var spawn: Location) : Listener {
                             .build()
                     Operations.complete(operation)
                 }
+
+        this.arenaState = ArenaState.WAITING
+        this.players.clear()
     }
 
 
@@ -175,7 +177,6 @@ abstract class MiniGameMap(val name: String, var spawn: Location) : Listener {
     fun eliminatePlayer(player: Player) {
         playerScore[player] = players.size
         players.remove(player)
-
         broadcast(getHeaderComponent()
                 .append(player.displayName() )
                 .append(" a été éliminé",NamedTextColor.RED))
@@ -193,7 +194,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location) : Listener {
     fun joinSpectator(player: Player) {
         spectators.add(player)
         player.gameMode = GameMode.SPECTATOR
-        player.teleport(player)
+        player.teleport(spawn)
     }
 
 

@@ -71,6 +71,7 @@ class TntRunCommand {
         fun startCommand(@Argument(value = "arena", clazz= TntRunMapArguments::class) map: TntRunMap){
             map.start()
         }
+
         @Command
         fun addPlaySpawnCommand(@Argument(value = "arena", clazz= TntRunMapArguments::class) map: TntRunMap,
                                 sender: Player){
