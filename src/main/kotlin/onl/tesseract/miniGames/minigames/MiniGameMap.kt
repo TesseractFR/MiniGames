@@ -54,6 +54,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location) : Listener {
     var arenaState: ArenaState = ArenaState.WAITING
 
     open fun start() {
+        if(players.size <= 1)return
         MiniGamesPlugin.instance.server.pluginManager.registerEvents(this, MiniGamesPlugin.instance)
         var i = 0
         for (p in players) {
@@ -86,13 +87,13 @@ abstract class MiniGameMap(val name: String, var spawn: Location) : Listener {
         this.arenaState = ArenaState.ENDING
         val lp = players.elementAt(0)
         playerScore[lp] = 1
-        players.remove(lp)
         lp.teleport(spawn)
-        broadcastTitle(Component.text("Victoire de ")
-                .append(lp.displayName())
+        broadcastTitle(Component.text("Victoire de ",NamedTextColor.GOLD)
+                .append(lp.displayName().color(NamedTextColor.GOLD))
         ,Component.empty())
         sendRanking()
         FireworkHelper.fireWorkEffect(lp)
+        players.remove(lp)
         object : BukkitRunnable() {
             override fun run() {
                 this@MiniGameMap.resetArena()
@@ -174,12 +175,12 @@ abstract class MiniGameMap(val name: String, var spawn: Location) : Listener {
 
     protected abstract fun playerLeaveArena(player: Player)
 
-    fun eliminatePlayer(player: Player) {
+    open fun eliminatePlayer(player: Player) {
         playerScore[player] = players.size
-        players.remove(player)
         broadcast(getHeaderComponent()
                 .append(player.displayName() )
                 .append(" a été éliminé",NamedTextColor.RED))
+        players.remove(player)
         player.teleport(this.spawn)
         joinSpectator(player)
         if(checkEnd()) {

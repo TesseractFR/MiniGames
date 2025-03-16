@@ -12,16 +12,15 @@ import onl.tesseract.miniGames.utils.enums.ArenaState
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
-import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitRunnable
-import org.bukkit.util.NumberConversions
-
-
 
 
 class TntRunMap(name: String, spawn : Location) : MiniGameMap(name, spawn) {
@@ -73,8 +72,18 @@ class TntRunMap(name: String, spawn : Location) : MiniGameMap(name, spawn) {
         super.start()
         MiniGamesPlugin.instance.server.pluginManager.registerEvents(this, MiniGamesPlugin.instance)
         blockRemoveTask = getBlockRemoveTask()
-        blockRemoveTask.runTaskTimer(MiniGamesPlugin.instance,0,5)
+        blockRemoveTask.runTaskTimer(MiniGamesPlugin.instance,0,3)
+        for(p in players){
+            p.isCollidable = false
+            p.addPotionEffect(PotionEffect(PotionEffectType.SATURATION,PotionEffect.INFINITE_DURATION,0,false,false))
+        }
 
+    }
+
+    override fun eliminatePlayer(player: Player) {
+        player.isCollidable = true
+        player.removePotionEffect(PotionEffectType.SATURATION)
+        super.eliminatePlayer(player)
     }
 
     override fun stop() {
@@ -111,6 +120,17 @@ class TntRunMap(name: String, spawn : Location) : MiniGameMap(name, spawn) {
             }
             return map
         }
+    }
+
+    @EventHandler
+    fun onDamage(event : EntityDamageEvent) {
+        if (event.entity.type != EntityType.PLAYER)
+            return
+        val player = event.entity as Player
+        if(player !in players){
+            return
+        }
+        event.isCancelled = true
     }
 
 }
