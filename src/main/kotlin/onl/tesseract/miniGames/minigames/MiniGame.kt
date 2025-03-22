@@ -3,6 +3,8 @@ package onl.tesseract.miniGames.minigames
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+import onl.tesseract.lib.inventory.InventoryInstanceConfigurationBuilder
+import onl.tesseract.lib.inventory.InventoryInstanceManager
 import onl.tesseract.miniGames.utils.MINIGAMES_GAMES_FOLDER_NAME
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
@@ -26,6 +28,15 @@ abstract class MiniGame(val name: String) {
 
     init {
         loadConfig()
+        initInventory()
+    }
+
+    open fun initInventory(){
+        InventoryInstanceManager.addConfig(
+            InventoryInstanceConfigurationBuilder()
+                    .setName(name)
+                    .setWorld(null)
+                    .build())
     }
 
     protected fun loadConfig() : YamlConfiguration {

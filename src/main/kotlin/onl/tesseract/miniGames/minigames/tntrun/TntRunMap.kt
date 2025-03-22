@@ -81,8 +81,6 @@ class TntRunMap(name: String, spawn : Location) : MiniGameMap(name, spawn) {
     }
 
     override fun eliminatePlayer(player: Player) {
-        player.isCollidable = true
-        player.removePotionEffect(PotionEffectType.SATURATION)
         super.eliminatePlayer(player)
     }
 
@@ -111,8 +109,8 @@ class TntRunMap(name: String, spawn : Location) : MiniGameMap(name, spawn) {
             val name = configurationSection.name
             val spawn = configurationSection.getLocation(SPAWN) ?: Bukkit.getWorlds()[0].spawnLocation
             val map = TntRunMap(name, spawn)
-            map.arena = configurationSection.getConfigurationSection(ARENA)
-                    ?.let { Cuboid.deserialize(it) } ?: Cuboid(spawn, spawn)
+            (configurationSection.getConfigurationSection(ARENA)
+                    ?.let { Cuboid.deserialize(it) } ?: Cuboid(spawn, spawn)).also { map.arena = it }
             if(configurationSection.contains(PLAYSPAWN)) {
                 for(x in configurationSection.getList(PLAYSPAWN)!!) {
                     map.playSpawn.add(x as Location)

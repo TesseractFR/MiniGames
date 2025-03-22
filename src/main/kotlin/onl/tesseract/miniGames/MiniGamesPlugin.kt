@@ -1,30 +1,28 @@
 package onl.tesseract.miniGames
 
 
+import onl.tesseract.lib.TesseractLib
 import onl.tesseract.miniGames.command.MinigamesAdminCommand
 import onl.tesseract.miniGames.command.MinigamesCommand
 import onl.tesseract.miniGames.minigames.MiniGame
 import onl.tesseract.miniGames.minigames.tntrun.TntRun
 import onl.tesseract.miniGames.utils.MINIGAMES_FOLDER_NAME
-import org.bukkit.Bukkit
-import org.bukkit.Location
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
-import java.util.*
 
 
 class MiniGamesPlugin : JavaPlugin(), Listener {
 
     val miniGames = mutableMapOf<String, MiniGame>()
-    private val players = mutableMapOf<UUID,MiniGamesPlayer>()
 
     override fun onEnable() {
         instance = this
+        TesseractLib.registerOnEnable(this)
+        TesseractLib.loadInventoryConfigurations()
         loadMiniGames()
         loadConfig()
         server.pluginManager.registerEvents(this,this)

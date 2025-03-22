@@ -17,8 +17,10 @@ import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
+import onl.tesseract.lib.inventory.InventoryInstanceManager
 import onl.tesseract.lib.util.append
 import onl.tesseract.miniGames.MiniGamesPlugin
+import onl.tesseract.miniGames.TNT_RUN_GAMES
 import onl.tesseract.miniGames.utils.MINIGAMES_GAMES_FOLDER_NAME
 import onl.tesseract.miniGames.utils.cuboid.Cuboid
 import onl.tesseract.miniGames.utils.enums.ArenaState
@@ -32,6 +34,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitRunnable
 import java.io.File
 import java.io.FileInputStream
@@ -59,6 +62,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location) : Listener {
         var i = 0
         for (p in players) {
             p.teleport(playSpawn.elementAt(i++))
+            setInventory(p)
             i %= playSpawn.size
         }
         val countDown = AtomicInteger(5)
@@ -93,6 +97,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location) : Listener {
         ,Component.empty())
         sendRanking()
         FireworkHelper.fireWorkEffect(lp)
+        unsetInventory(lp)
         players.remove(lp)
         object : BukkitRunnable() {
             override fun run() {
@@ -183,6 +188,9 @@ abstract class MiniGameMap(val name: String, var spawn: Location) : Listener {
         players.remove(player)
         player.teleport(this.spawn)
         joinSpectator(player)
+        player.isCollidable = true
+        player.removePotionEffect(PotionEffectType.SATURATION)
+        unsetInventory(player)
         if(checkEnd()) {
             stop()
         }
@@ -225,6 +233,15 @@ abstract class MiniGameMap(val name: String, var spawn: Location) : Listener {
                     .append(Component.text("La partie n'est pas en attente", NamedTextColor.YELLOW)))
 
 
+    }
+
+    open protected fun setInventory(player: Player){
+        InventoryInstanceManager.selectConfig(player, TNT_RUN_GAMES)
+        player.inventory.clear()
+    }
+
+    open protected fun unsetInventory(player: Player){
+        InventoryInstanceManager.selectConfig(player,"default")
     }
 
     protected fun sendRanking(){
