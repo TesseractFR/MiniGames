@@ -35,6 +35,7 @@ abstract class MiniGame(val name: String) {
         InventoryInstanceManager.addConfig(
             InventoryInstanceConfigurationBuilder()
                     .setName(name)
+                    .setRestrictInvocables(true)
                     .setWorld(null)
                     .build())
     }
