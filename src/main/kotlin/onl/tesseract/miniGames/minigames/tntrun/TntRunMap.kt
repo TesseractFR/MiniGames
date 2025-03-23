@@ -3,6 +3,7 @@ package onl.tesseract.miniGames.minigames.tntrun
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import onl.tesseract.miniGames.MiniGamesPlugin
+import onl.tesseract.miniGames.TNT_RUN_GAMES
 import onl.tesseract.miniGames.minigames.ARENA
 import onl.tesseract.miniGames.minigames.MiniGameMap
 import onl.tesseract.miniGames.minigames.PLAYSPAWN
@@ -14,16 +15,13 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.configuration.ConfigurationSection
-import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitRunnable
 
 
-class TntRunMap(name: String, spawn : Location) : MiniGameMap(name, spawn) {
+class TntRunMap(name: String, spawn : Location) : MiniGameMap(name, spawn, TNT_RUN_GAMES) {
 
     private lateinit var blockRemoveTask : BukkitRunnable
 
@@ -104,6 +102,10 @@ class TntRunMap(name: String, spawn : Location) : MiniGameMap(name, spawn) {
                 .append(Component.text("] ", NamedTextColor.GOLD))
     }
 
+    override fun canPVPDuringGame(): Boolean {
+        return false
+    }
+
     companion object {
         fun of(configurationSection: ConfigurationSection): MiniGameMap {
             val name = configurationSection.name
@@ -120,15 +122,6 @@ class TntRunMap(name: String, spawn : Location) : MiniGameMap(name, spawn) {
         }
     }
 
-    @EventHandler
-    fun onDamage(event : EntityDamageEvent) {
-        if (event.entity.type != EntityType.PLAYER)
-            return
-        val player = event.entity as Player
-        if(player !in players){
-            return
-        }
-        event.isCancelled = true
-    }
+
 
 }

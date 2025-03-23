@@ -20,7 +20,6 @@ import net.kyori.adventure.text.format.TextDecoration
 import onl.tesseract.lib.inventory.InventoryInstanceManager
 import onl.tesseract.lib.util.append
 import onl.tesseract.miniGames.MiniGamesPlugin
-import onl.tesseract.miniGames.TNT_RUN_GAMES
 import onl.tesseract.miniGames.utils.MINIGAMES_GAMES_FOLDER_NAME
 import onl.tesseract.miniGames.utils.cuboid.Cuboid
 import onl.tesseract.miniGames.utils.enums.ArenaState
@@ -30,9 +29,11 @@ import onl.tesseract.miniGames.utils.helpers.TitleHelper
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitRunnable
@@ -45,7 +46,7 @@ const val SPAWN = "spawn"
 const val ARENA = "arena"
 const val PLAYSPAWN = "playspawn"
 private val STARTING_TITLE_COMPONENT = Component.text("Début de la partie dans", NamedTextColor.GOLD, TextDecoration.BOLD)
-abstract class MiniGameMap(val name: String, var spawn: Location) : Listener {
+abstract class MiniGameMap(val name: String, var spawn: Location, private val miniGameName: String) : Listener {
 
     protected var arena : Cuboid = Cuboid(spawn,spawn)
     protected val schemFilePath = MINIGAMES_GAMES_FOLDER_NAME + "/" + this.javaClass.simpleName + "/" + name + ".schem"
@@ -236,7 +237,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location) : Listener {
     }
 
     open protected fun setInventory(player: Player){
-        InventoryInstanceManager.selectConfig(player, TNT_RUN_GAMES)
+        InventoryInstanceManager.selectConfig(player, miniGameName)
         player.inventory.clear()
     }
 
@@ -275,4 +276,22 @@ abstract class MiniGameMap(val name: String, var spawn: Location) : Listener {
 
     abstract fun getHeaderComponent(): Component
 
+    abstract fun canPVPDuringGame():Boolean
+
+
+    @EventHandler
+    fun onDamage(event : EntityDamageEvent) {
+        if (event.entity.type != EntityType.PLAYER)
+            return
+        val player = event.entity as Player
+        if(player !in players){
+            return
+        }
+        if(arenaState != ArenaState.INGAME){
+            event.isCancelled = true
+            return
+        }
+        if(canPVPDuringGame())
+            event.isCancelled = false
+    }
 }
