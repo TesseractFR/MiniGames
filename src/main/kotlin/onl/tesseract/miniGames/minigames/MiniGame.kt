@@ -6,6 +6,7 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import onl.tesseract.lib.inventory.InventoryInstanceConfigurationBuilder
 import onl.tesseract.lib.inventory.InventoryInstanceManager
 import onl.tesseract.miniGames.utils.MINIGAMES_GAMES_FOLDER_NAME
+import org.bukkit.GameMode
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
@@ -37,6 +38,7 @@ abstract class MiniGame(val name: String) {
                     .setName(name)
                     .setRestrictInvocables(true)
                     .setWorld(null)
+                    .setGameMode(GameMode.ADVENTURE)
                     .build())
     }
 
