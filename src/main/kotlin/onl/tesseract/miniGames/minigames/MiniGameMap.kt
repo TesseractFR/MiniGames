@@ -291,7 +291,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
             event.isCancelled = true
             return
         }
-        if(canPVPDuringGame())
-            event.isCancelled = false
+        if(!canPVPDuringGame())
+            event.isCancelled = true
     }
 }
