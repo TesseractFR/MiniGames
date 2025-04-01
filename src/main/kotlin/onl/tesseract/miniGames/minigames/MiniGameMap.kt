@@ -56,6 +56,8 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
     val spectators = mutableSetOf<Player>()
     val playerScore = mutableMapOf<Player, Int>()
     var arenaState: ArenaState = ArenaState.WAITING
+    protected var pvpEnabled = false
+    protected var freezeAtStart = true
 
     open fun start() {
         if(players.size <= 1)return
@@ -170,12 +172,22 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
 
     @EventHandler
     fun onPlayerMove(event: PlayerMoveEvent) {
-        if (arenaState == ArenaState.INGAME) {
-            if (players.contains(event.player)) {
-                if (event.player.location !in arena) {
-                    playerLeaveArena(event.player)
+        when(arenaState){
+            ArenaState.WAITING -> {}
+            ArenaState.STARTING -> {
+                if(freezeAtStart){
+                    event.isCancelled = true
                 }
             }
+            ArenaState.INGAME -> {
+                if (players.contains(event.player)) {
+                    if (event.player.location !in arena) {
+                        playerLeaveArena(event.player)
+                    }
+                }
+            }
+            ArenaState.ENDING -> {}
+            ArenaState.DISABLED -> {}
         }
     }
 
@@ -276,9 +288,6 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
 
     abstract fun getHeaderComponent(): Component
 
-    abstract fun canPVPDuringGame():Boolean
-
-
     @EventHandler
     fun onDamage(event : EntityDamageEvent) {
         if (event.entity.type != EntityType.PLAYER)
@@ -291,7 +300,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
             event.isCancelled = true
             return
         }
-        if(!canPVPDuringGame())
+        if(!pvpEnabled)
             event.isCancelled = true
     }
 }

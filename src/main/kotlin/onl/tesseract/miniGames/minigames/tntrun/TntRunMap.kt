@@ -23,6 +23,9 @@ import org.bukkit.scheduler.BukkitRunnable
 
 class TntRunMap(name: String, spawn : Location) : MiniGameMap(name, spawn, TNT_RUN_GAMES) {
 
+    init {
+        this.freezeAtStart = false
+    }
     private lateinit var blockRemoveTask : BukkitRunnable
 
     private fun getBlockRemoveTask(): BukkitRunnable {
@@ -102,9 +105,6 @@ class TntRunMap(name: String, spawn : Location) : MiniGameMap(name, spawn, TNT_R
                 .append(Component.text("] ", NamedTextColor.GOLD))
     }
 
-    override fun canPVPDuringGame(): Boolean {
-        return false
-    }
 
     companion object {
         fun of(configurationSection: ConfigurationSection): MiniGameMap {

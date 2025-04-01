@@ -2,7 +2,7 @@ package onl.tesseract.miniGames.minigames.sumo
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import onl.tesseract.lib.util.ItemBuilder
+import onl.tesseract.lib.menu.ItemBuilder
 import onl.tesseract.lib.util.append
 import onl.tesseract.miniGames.SUMO_GAMES
 import onl.tesseract.miniGames.minigames.ARENA
@@ -18,6 +18,11 @@ import org.bukkit.enchantments.Enchantment.KNOCKBACK
 import org.bukkit.entity.Player
 
 class SumoMap(name: String, spawn : Location) : MiniGameMap(name, spawn, SUMO_GAMES){
+
+    init {
+        pvpEnabled = true
+    }
+
     companion object {
         fun of(configurationSection: ConfigurationSection): MiniGameMap {
             val name = configurationSection.name
@@ -44,9 +49,6 @@ class SumoMap(name: String, spawn : Location) : MiniGameMap(name, spawn, SUMO_GA
                 .append(Component.text("] ", NamedTextColor.GOLD))
     }
 
-    override fun canPVPDuringGame(): Boolean {
-        return true
-    }
 
     override fun setInventory(player: Player) {
         super.setInventory(player)
@@ -58,8 +60,8 @@ class SumoMap(name: String, spawn : Location) : MiniGameMap(name, spawn, SUMO_GA
                 .name(Component.text("[", NamedTextColor.GOLD)
                         .append("Gros bâton", NamedTextColor.YELLOW)
                         .append("]", NamedTextColor.GOLD))
+                .addEnchantment(KNOCKBACK, 2)
                 .build()
-        stick.addUnsafeEnchantment(KNOCKBACK, 2)
         player.inventory.addItem(stick)
     }
 
