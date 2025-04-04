@@ -64,6 +64,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
         MiniGamesPlugin.instance.server.pluginManager.registerEvents(this, MiniGamesPlugin.instance)
         var i = 0
         for (p in players) {
+            p.clearActivePotionEffects()
             p.teleport(playSpawn.elementAt(i++))
             setInventory(p)
             i %= playSpawn.size
