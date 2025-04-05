@@ -5,6 +5,7 @@ import onl.tesseract.lib.TesseractLib
 import onl.tesseract.miniGames.command.MinigamesAdminCommand
 import onl.tesseract.miniGames.command.MinigamesCommand
 import onl.tesseract.miniGames.minigames.MiniGame
+import onl.tesseract.miniGames.minigames.pitchout.Pitchout
 import onl.tesseract.miniGames.minigames.pvparena.PvpArena
 import onl.tesseract.miniGames.minigames.sumo.Sumo
 import onl.tesseract.miniGames.minigames.tntrun.TntRun
@@ -47,6 +48,7 @@ class MiniGamesPlugin : JavaPlugin(), Listener {
         miniGames[TNT_RUN_GAMES] = TntRun(this)
         miniGames[SUMO_GAMES] = Sumo(this)
         miniGames[PVP_ARENA] = PvpArena(this)
+        miniGames[PITCHOUT] = Pitchout(this)
     }
     private fun saveMiniGames() {
         miniGames.forEach {
