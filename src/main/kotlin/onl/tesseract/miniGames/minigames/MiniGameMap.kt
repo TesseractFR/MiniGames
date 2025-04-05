@@ -33,6 +33,7 @@ import org.bukkit.entity.Arrow
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
+import org.bukkit.entity.TNTPrimed
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -381,6 +382,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
 
     @EventHandler
     fun onPlayerDeath(event: EntityDamageByEntityEvent) {
+        if(event.entity !is Player)return
         val player = event.entity as Player
         if(player !in players){return}
         if(player.health - event.damage <= 0){
@@ -390,7 +392,13 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
                 if(shooter is Player){
                     killer = shooter
                 }
+            }else if (event.damager is TNTPrimed){
+                val source = (event.damager as TNTPrimed).source
+                if(source is Player){
+                    killer = source
+                }
             }
+
             playerKilled(player, killer)
             event.isCancelled = true
         }

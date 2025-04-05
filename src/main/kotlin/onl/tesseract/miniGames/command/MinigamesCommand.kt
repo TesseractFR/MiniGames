@@ -6,7 +6,7 @@ import onl.tesseract.miniGames.command.basic.*
 
 @Command(
     name = "minigames",
-    subCommands = [TntRunCommand::class, SumoCommand::class],
+    subCommands = [TntRunCommand::class, SumoCommand::class, PvpArenaCommand::class],
 )
 class MinigamesCommand : CommandContext(){
 }
