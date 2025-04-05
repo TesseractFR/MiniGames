@@ -7,6 +7,7 @@ import onl.tesseract.lib.inventory.InventoryInstanceConfigurationBuilder
 import onl.tesseract.lib.inventory.InventoryInstanceManager
 import onl.tesseract.miniGames.utils.MINIGAMES_GAMES_FOLDER_NAME
 import org.bukkit.GameMode
+import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
@@ -66,4 +67,6 @@ abstract class MiniGame(val name: String) {
             map.value.save(createSection.createSection(map.key))
         }
     }
+
+    abstract fun createMap(name: String, location: Location): MiniGameMap
 }

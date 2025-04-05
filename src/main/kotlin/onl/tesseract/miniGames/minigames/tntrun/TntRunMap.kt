@@ -71,7 +71,6 @@ class TntRunMap(name: String, spawn : Location) : MiniGameMap(name, spawn, TNT_R
 
     override fun start() {
         super.start()
-        MiniGamesPlugin.instance.server.pluginManager.registerEvents(this, MiniGamesPlugin.instance)
         blockRemoveTask = getBlockRemoveTask()
         blockRemoveTask.runTaskTimer(MiniGamesPlugin.instance,0,3)
         for(p in players){
