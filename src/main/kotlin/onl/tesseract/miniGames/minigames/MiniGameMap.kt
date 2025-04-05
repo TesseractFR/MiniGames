@@ -29,10 +29,13 @@ import onl.tesseract.miniGames.utils.helpers.TitleHelper
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.entity.Arrow
+import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.potion.PotionEffectType
@@ -55,9 +58,14 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
     val players = mutableSetOf<Player>()
     val spectators = mutableSetOf<Player>()
     val playerScore = mutableMapOf<Player, Int>()
+    val playerKills = mutableMapOf<Player, Int>()
     var arenaState: ArenaState = ArenaState.WAITING
     protected var pvpEnabled = false
+    protected val dropOnDeath = false
     protected var freezeAtStart = true
+    protected var lifeSystem = false
+    protected var maxLife = 0
+    val playersLifes = mutableMapOf<Player, Int>()
 
     open fun start() {
         if(players.size <= 1)return
@@ -68,6 +76,9 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
             p.teleport(playSpawn.elementAt(i++))
             setInventory(p)
             i %= playSpawn.size
+            playersLifes[p] = maxLife
+            p.health = 20.0
+            p.foodLevel = 20
         }
         val countDown = AtomicInteger(5)
         object : BukkitRunnable() {
@@ -148,6 +159,10 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
     }
 
     fun resetArena() {
+        players.clear()
+        playerScore.clear()
+        playersLifes.clear()
+        playerKills.clear()
         val clipboard: Clipboard
         val file = File(this.schemFilePath)
         val format = BuiltInClipboardFormat.FAST_V3
@@ -200,11 +215,10 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
                 .append(player.displayName() )
                 .append(" a été éliminé",NamedTextColor.RED))
         players.remove(player)
-        player.teleport(this.spawn)
-        joinSpectator(player)
         player.isCollidable = true
         player.removePotionEffect(PotionEffectType.SATURATION)
         unsetInventory(player)
+        joinSpectator(player)
         if(checkEnd()) {
             stop()
         }
@@ -264,9 +278,14 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
         playerScore.toList().sortedBy { it.second }.forEach {
             color = ComponentHelper.getColorForRank(it.second)
             broadcast(Component.text("          ${it.second} - ",color)
-                    .append(it.first.displayName().color(color)))
+                    .append(it.first.displayName().color(color))
+                    .append(getRankingDetail(it.first)))
         }
         broadcast(Component.text("-----------------------",NamedTextColor.DARK_AQUA))
+    }
+
+    protected open fun getRankingDetail(player: Player): Component {
+        return Component.empty()
     }
 
 
@@ -286,8 +305,62 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
             TitleHelper.sendTitle(p,title,subtitle)
         }
     }
-
+    fun getRandomSpawn(): Location {
+        return playSpawn.elementAt((0..<playSpawn.size).random())
+    }
     abstract fun getHeaderComponent(): Component
+
+    open fun playerKilled(player: Player, killer: Entity) {
+        if (dropOnDeath) {
+            for (itemStack in player.inventory) {
+                player.world.dropItemNaturally(player.location, itemStack)
+            }
+        }
+        if(killer is Player){
+            playerKills[killer] = playerKills[killer]?.plus(1) ?: 1
+        }
+        if (lifeSystem) {
+            playersLifes[player] = playersLifes[player]?.minus(1) ?: 0
+            displayPlayerKilled(player, killer)
+            if (playersLifes[player]!! <= 0) {
+                eliminatePlayer(player)
+            }
+        }
+        else{
+            displayPlayerKilled(player, killer)
+            eliminatePlayer(player)
+        }
+        player.health = 20.0
+
+    }
+    protected fun getDisplayPlayerComponent(player: Player) : Component{
+        var component = player.displayName().color(NamedTextColor.GOLD);
+        if(lifeSystem){
+            if((playersLifes[player] ?: 0) > 0){
+                component = component.append(" (",NamedTextColor.YELLOW)
+                for (i in 1..(playersLifes[player] ?: 1)) {
+                    component = component.append("♥", NamedTextColor.RED)
+                }
+                component = component.append(") ",NamedTextColor.YELLOW)
+            }
+
+        }
+        return component
+    }
+    protected open fun displayPlayerKilled(player: Player, killer: Entity) {
+        var component : Component = Component.empty()
+        component = if(killer is Player){
+            component.append(getDisplayPlayerComponent(killer))
+        }else{
+            component.append(killer.name())
+        }
+
+        component = component.append(" a vaincu ", NamedTextColor.YELLOW)
+
+        component = component.append(getDisplayPlayerComponent(player))
+
+        broadcast(component)
+    }
 
     @EventHandler
     fun onDamage(event : EntityDamageEvent) {
@@ -303,5 +376,23 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
         }
         if(!pvpEnabled)
             event.isCancelled = true
+    }
+
+
+    @EventHandler
+    fun onPlayerDeath(event: EntityDamageByEntityEvent) {
+        val player = event.entity as Player
+        if(player !in players){return}
+        if(player.health - event.damage <= 0){
+            var killer = event.damager;
+            if(event.damager is Arrow){
+                val shooter = (event.damager as Arrow).shooter
+                if(shooter is Player){
+                    killer = shooter
+                }
+            }
+            playerKilled(player, killer)
+            event.isCancelled = true
+        }
     }
 }
