@@ -78,7 +78,8 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
             setInventory(p)
             i %= playSpawn.size
             playersLifes[p] = maxLife
-            p.health = 20.0
+            p.maxHealth = 20.0
+            p.health = p.maxHealth
             p.foodLevel = 20
         }
         val countDown = AtomicInteger(5)
