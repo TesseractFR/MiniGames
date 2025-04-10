@@ -332,7 +332,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
             displayPlayerKilled(player, killer)
             eliminatePlayer(player)
         }
-        player.health = 20.0
+        player.health =player.maxHealth
 
     }
     protected fun getDisplayPlayerComponent(player: Player) : Component{

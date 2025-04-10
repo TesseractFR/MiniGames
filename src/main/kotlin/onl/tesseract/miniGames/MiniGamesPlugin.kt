@@ -4,6 +4,7 @@ package onl.tesseract.miniGames
 import onl.tesseract.lib.TesseractLib
 import onl.tesseract.miniGames.command.MinigamesAdminCommand
 import onl.tesseract.miniGames.command.MinigamesCommand
+import onl.tesseract.miniGames.command.NickCommand
 import onl.tesseract.miniGames.minigames.MiniGame
 import onl.tesseract.miniGames.minigames.pitchout.Pitchout
 import onl.tesseract.miniGames.minigames.pvparena.PvpArena
@@ -35,6 +36,7 @@ class MiniGamesPlugin : JavaPlugin(), Listener {
         loadConfig()
         server.pluginManager.registerEvents(this,this)
         this.getCommand("minigames")?.setExecutor(MinigamesCommand())
+        this.getCommand("nick")?.setExecutor(NickCommand())
         this.getCommand("minigamesadmin")?.setExecutor(MinigamesAdminCommand())
 
     }

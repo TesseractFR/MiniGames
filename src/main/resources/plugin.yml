@@ -18,3 +18,5 @@ commands:
     usage: "/inventory"
   log:
     usage: "/log"
+  nick:
+    usage: "/nick"
