@@ -17,6 +17,8 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 import org.bukkit.util.Vector
 
 
@@ -38,7 +40,16 @@ class QuakeMap(name: String, spawn: Location) : MiniGameMap(name, spawn, QUAKE) 
     private fun playerTouch(player: Player,target: Player) {
         playerKilled(target,player)
         target.teleport(getRandomSpawn())
-        target.maxHealth = playersLifes[target]?.times(2.0)?:20.0
+        if(player in players){
+            target.maxHealth = playersLifes[target]?.times(2.0)?:20.0
+        }
+    }
+
+    override fun start() {
+        super.start()
+        for(p in players){
+            p.addPotionEffect(PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION,0,false,false))
+        }
     }
 
     @EventHandler

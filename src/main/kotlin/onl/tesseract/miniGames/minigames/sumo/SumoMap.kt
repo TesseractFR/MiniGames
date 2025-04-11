@@ -16,6 +16,8 @@ import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.enchantments.Enchantment.KNOCKBACK
 import org.bukkit.entity.Player
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 
 class SumoMap(name: String, spawn : Location) : MiniGameMap(name, spawn, SUMO_GAMES){
 
@@ -36,6 +38,13 @@ class SumoMap(name: String, spawn : Location) : MiniGameMap(name, spawn, SUMO_GA
                 }
             }
             return map
+        }
+    }
+
+    override fun start() {
+        super.start()
+        for(p in players){
+            p.addPotionEffect(PotionEffect(PotionEffectType.SATURATION, PotionEffect.INFINITE_DURATION,0,false,false))
         }
     }
 

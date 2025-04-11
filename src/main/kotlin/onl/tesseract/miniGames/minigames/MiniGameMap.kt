@@ -81,6 +81,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
             p.maxHealth = 20.0
             p.health = p.maxHealth
             p.foodLevel = 20
+            p.saturation = 14f
         }
         val countDown = AtomicInteger(5)
         object : BukkitRunnable() {
@@ -162,6 +163,8 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
 
     fun resetArena() {
         players.clear()
+        val oldPlayers = mutableSetOf<Player>()
+        oldPlayers.addAll(playerScore.keys)
         playerScore.clear()
         playersLifes.clear()
         playerKills.clear()
@@ -185,6 +188,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
 
         this.arenaState = ArenaState.WAITING
         this.players.clear()
+        this.players.addAll(oldPlayers)
     }
 
 
@@ -254,7 +258,8 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
             broadcast(
                 getHeaderComponent()
                         .append(player.displayName())
-                        .append(Component.text(" a rejoind la partie ", NamedTextColor.YELLOW)))
+                        .append(Component.text(" a rejoint la partie ", NamedTextColor.YELLOW))
+                        .append("(${players.size})", NamedTextColor.GOLD))
             return
         }
 
@@ -403,5 +408,15 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
             playerKilled(player, killer)
             event.isCancelled = true
         }
+    }
+
+    fun leave(sender: Player){
+        if(spectators.contains(sender)){
+            spectators.remove(sender)
+        }
+        if(arenaState != ArenaState.INGAME){
+            players.remove(sender)
+        }
+        return
     }
 }
