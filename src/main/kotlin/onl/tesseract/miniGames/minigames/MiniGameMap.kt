@@ -30,14 +30,15 @@ import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Arrow
-import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.entity.TNTPrimed
 import org.bukkit.event.EventHandler
+import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitRunnable
@@ -122,6 +123,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
                 this@MiniGameMap.resetArena()
             }
         }.runTaskLaterAsynchronously(MiniGamesPlugin.instance,10)
+        HandlerList.unregisterAll(this)
 
     }
 
@@ -182,13 +184,18 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
                     val operation: Operation = ClipboardHolder(clipboard)
                             .createPaste(editSession)
                             .to(BlockVector3.at(arena.low.x,arena.low.y,arena.low.z)) // configure here
+                            .copyEntities(false)
                             .build()
                     Operations.complete(operation)
                 }
 
         this.arenaState = ArenaState.WAITING
         this.players.clear()
-        this.players.addAll(oldPlayers)
+        object : BukkitRunnable() {
+            override fun run() {
+                oldPlayers.forEach { this@MiniGameMap.join(it) }
+            }
+        }.runTaskLater(MiniGamesPlugin.instance, 0)
     }
 
 
@@ -317,7 +324,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
     }
     abstract fun getHeaderComponent(): Component
 
-    open fun playerKilled(player: Player, killer: Entity) {
+    open fun playerKilled(player: Player, killer: Player?) {
         if (dropOnDeath) {
             for (itemStack in player.inventory) {
                 player.world.dropItemNaturally(player.location, itemStack)
@@ -354,17 +361,15 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
         }
         return component
     }
-    protected open fun displayPlayerKilled(player: Player, killer: Entity) {
+    protected open fun displayPlayerKilled(player: Player, killer: Player?) {
         var component : Component = Component.empty()
         component = if(killer is Player){
             component.append(getDisplayPlayerComponent(killer))
+                    .append(" a vaincu ", NamedTextColor.YELLOW)
+                    .append(getDisplayPlayerComponent(player))
         }else{
-            component.append(killer.name())
+            getDisplayPlayerComponent(player).append(" a succombé", NamedTextColor.YELLOW)
         }
-
-        component = component.append(" a vaincu ", NamedTextColor.YELLOW)
-
-        component = component.append(getDisplayPlayerComponent(player))
 
         broadcast(component)
     }
@@ -391,23 +396,29 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
         if(event.entity !is Player)return
         val player = event.entity as Player
         if(player !in players){return}
-        if(player.health - event.damage <= 0){
-            var killer = event.damager;
-            if(event.damager is Arrow){
-                val shooter = (event.damager as Arrow).shooter
+        if (player.health - event.finalDamage <= 0) {
+            var damager = event.damager
+            if (damager is Arrow) {
+                val shooter = damager.shooter
                 if(shooter is Player){
-                    killer = shooter
+                    player.killer = shooter
                 }
-            }else if (event.damager is TNTPrimed){
-                val source = (event.damager as TNTPrimed).source
-                if(source is Player){
-                    killer = source
+            } else if (damager is TNTPrimed) {
+                val source = damager.source
+                if (source is Player) {
+                    player.killer = source
                 }
             }
-
-            playerKilled(player, killer)
-            event.isCancelled = true
         }
+    }
+
+    @EventHandler
+    fun onPlayerDeath(event: PlayerDeathEvent) {
+        val victim: Player = event.player
+        if (players.contains(victim)) {
+            playerKilled(victim, victim.killer)
+        }
+        event.isCancelled = true
     }
 
     fun leave(sender: Player){

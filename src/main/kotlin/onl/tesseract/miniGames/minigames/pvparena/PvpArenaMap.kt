@@ -37,7 +37,7 @@ class PvpArenaMap(name: String, spawn: Location) : MiniGameMap(name, spawn, PVP_
         player.teleport(getRandomSpawn())
     }
 
-    override fun playerKilled(player: Player, killer: Entity) {
+    override fun playerKilled(player: Player, killer: Player?) {
         super.playerKilled(player, killer)
         if(player in players)
             player.teleport(getRandomSpawn())
