@@ -9,7 +9,6 @@ import onl.tesseract.miniGames.minigames.ARENA
 import onl.tesseract.miniGames.minigames.MiniGameMap
 import onl.tesseract.miniGames.minigames.PLAYSPAWN
 import onl.tesseract.miniGames.minigames.SPAWN
-import onl.tesseract.miniGames.minigames.sumo.SumoMap
 import onl.tesseract.miniGames.utils.cuboid.Cuboid
 import org.bukkit.Bukkit
 import org.bukkit.Location

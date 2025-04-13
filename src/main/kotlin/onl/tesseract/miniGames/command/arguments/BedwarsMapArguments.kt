@@ -2,17 +2,17 @@ package onl.tesseract.miniGames.command.arguments
 
 import onl.tesseract.commandBuilder.CommandArgument
 import onl.tesseract.commandBuilder.CommandArgumentBuilderSteps
+import onl.tesseract.miniGames.BEDWARS_GAMES
 import onl.tesseract.miniGames.MiniGamesPlugin
-import onl.tesseract.miniGames.PVP_ARENA
-import onl.tesseract.miniGames.minigames.pvparena.PvpArenaMap
+import onl.tesseract.miniGames.minigames.bedwars.BedwarsMap
 
-class PvpArenaMapArguments(name: String) : CommandArgument<PvpArenaMap>(name) {
-    override fun define(builder: CommandArgumentBuilderSteps.Parser<PvpArenaMap>) {
+class BedwarsMapArguments(name: String) : CommandArgument<BedwarsMap>(name) {
+    override fun define(builder: CommandArgumentBuilderSteps.Parser<BedwarsMap>) {
         builder.parser { input, _ ->
-            MiniGamesPlugin.instance.miniGames[PVP_ARENA]!!.maps[input] as PvpArenaMap
+            MiniGamesPlugin.instance.miniGames[BEDWARS_GAMES]!!.maps[input] as BedwarsMap
         }
                 .tabCompleter { input, env ->
-                    MiniGamesPlugin.instance.miniGames[PVP_ARENA]!!.maps
+                    MiniGamesPlugin.instance.miniGames[BEDWARS_GAMES]!!.maps
                             .filter { it.key.startsWith(input) }.keys.toList()
                 }
                 .errorHandler(IllegalArgumentException::class.java, "Maps invalide")

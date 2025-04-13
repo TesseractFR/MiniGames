@@ -2,7 +2,6 @@ package onl.tesseract.miniGames.command.arguments
 
 import onl.tesseract.commandBuilder.CommandArgument
 import onl.tesseract.commandBuilder.CommandArgumentBuilderSteps
-import onl.tesseract.miniGames.MiniGamesPlugin
 import onl.tesseract.miniGames.minigames.MiniGameMap
 
 class MiniGamesMapArgument(name: String) : CommandArgument<MiniGameMap>(name) {

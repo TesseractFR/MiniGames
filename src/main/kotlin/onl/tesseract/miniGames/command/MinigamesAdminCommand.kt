@@ -7,6 +7,7 @@ import onl.tesseract.commandBuilder.annotation.Command
 import onl.tesseract.lib.command.argument.IntegerCommandArgument
 import onl.tesseract.lib.command.argument.StringArg
 import onl.tesseract.miniGames.MiniGamesPlugin
+import onl.tesseract.miniGames.command.admin.BedwarsCommand
 import onl.tesseract.miniGames.command.arguments.MiniGameArgument
 import onl.tesseract.miniGames.command.arguments.MiniGamesMapArgument
 import onl.tesseract.miniGames.minigames.MiniGame
@@ -14,7 +15,8 @@ import onl.tesseract.miniGames.minigames.MiniGameMap
 import org.bukkit.entity.Player
 
 @Command(
-    name = "minigamesadmin"
+    name = "minigamesadmin",
+    subCommands = [BedwarsCommand::class],
 )
 class MinigamesAdminCommand :CommandContext() {
     @Command
@@ -104,8 +106,4 @@ class MinigamesAdminCommand :CommandContext() {
     ) {
         map.playSpawn.add(sender.location)
     }
-
-
-
-
 }

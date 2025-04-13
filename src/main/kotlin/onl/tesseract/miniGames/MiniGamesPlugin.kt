@@ -6,6 +6,8 @@ import onl.tesseract.miniGames.command.MinigamesAdminCommand
 import onl.tesseract.miniGames.command.MinigamesCommand
 import onl.tesseract.miniGames.command.NickCommand
 import onl.tesseract.miniGames.minigames.MiniGame
+import onl.tesseract.miniGames.minigames.bedwars.Bedwars
+import onl.tesseract.miniGames.minigames.bedwars.OreGenerator
 import onl.tesseract.miniGames.minigames.pitchout.Pitchout
 import onl.tesseract.miniGames.minigames.pvparena.PvpArena
 import onl.tesseract.miniGames.minigames.quake.Quake
@@ -14,6 +16,7 @@ import onl.tesseract.miniGames.minigames.tntrun.TntRun
 import onl.tesseract.miniGames.utils.MINIGAMES_FOLDER_NAME
 import onl.tesseract.miniGames.utils.enums.ArenaState
 import org.bukkit.configuration.file.YamlConfiguration
+import org.bukkit.configuration.serialization.ConfigurationSerialization
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -32,13 +35,13 @@ class MiniGamesPlugin : JavaPlugin(), Listener {
         instance = this
         TesseractLib.registerOnEnable(this)
         TesseractLib.loadInventoryConfigurations()
+        ConfigurationSerialization.registerClass(OreGenerator::class.java)
         loadMiniGames()
         loadConfig()
         server.pluginManager.registerEvents(this,this)
         this.getCommand("minigames")?.setExecutor(MinigamesCommand())
         this.getCommand("nick")?.setExecutor(NickCommand())
         this.getCommand("minigamesadmin")?.setExecutor(MinigamesAdminCommand())
-
     }
 
     override fun onDisable() {
@@ -53,6 +56,7 @@ class MiniGamesPlugin : JavaPlugin(), Listener {
         miniGames[PVP_ARENA] = PvpArena(this)
         miniGames[PITCHOUT] = Pitchout(this)
         miniGames[QUAKE] = Quake(this)
+        miniGames[BEDWARS_GAMES] = Bedwars(this)
     }
     private fun saveMiniGames() {
         miniGames.forEach {

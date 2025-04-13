@@ -163,7 +163,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
 
     }
 
-    fun resetArena() {
+    open fun resetArena() {
         players.clear()
         val oldPlayers = mutableSetOf<Player>()
         oldPlayers.addAll(playerScore.keys)
@@ -196,6 +196,7 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
                 oldPlayers.forEach { this@MiniGameMap.join(it) }
             }
         }.runTaskLater(MiniGamesPlugin.instance, 0)
+        HandlerList.unregisterAll(this)
     }
 
 
@@ -345,7 +346,6 @@ abstract class MiniGameMap(val name: String, var spawn: Location, private val mi
             eliminatePlayer(player)
         }
         player.health =player.maxHealth
-
     }
     protected fun getDisplayPlayerComponent(player: Player) : Component{
         var component = player.displayName().color(NamedTextColor.GOLD);
