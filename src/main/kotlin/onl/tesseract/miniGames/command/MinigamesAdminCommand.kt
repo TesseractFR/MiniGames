@@ -10,6 +10,7 @@ import onl.tesseract.miniGames.MiniGamesPlugin
 import onl.tesseract.miniGames.command.admin.BedwarsCommand
 import onl.tesseract.miniGames.command.arguments.MiniGameArgument
 import onl.tesseract.miniGames.command.arguments.MiniGamesMapArgument
+import onl.tesseract.miniGames.command.arguments.OnlinePlayerArg
 import onl.tesseract.miniGames.minigames.MiniGame
 import onl.tesseract.miniGames.minigames.MiniGameMap
 import org.bukkit.entity.Player
@@ -106,4 +107,25 @@ class MinigamesAdminCommand :CommandContext() {
     ) {
         map.playSpawn.add(sender.location)
     }
+
+    @Command
+    fun joinCommand(
+        @Argument(value = "minigame", clazz = MiniGameArgument::class) minigame : MiniGame,
+        @Argument(value = "arena", clazz = MiniGamesMapArgument::class) map: MiniGameMap,
+        @Argument(value = "player", clazz = OnlinePlayerArg::class) player : Player,
+        sender: Player,
+    ) {
+        map.join(player)
+
+    }
+
+    @Command
+    fun leaveCommand(
+        @Argument(value = "minigame", clazz = MiniGameArgument::class) minigame : MiniGame,
+        @Argument(value = "arena", clazz = MiniGamesMapArgument::class) map: MiniGameMap,
+        @Argument(value = "player", clazz = OnlinePlayerArg::class) player : Player,
+        sender: Player){
+        map.leave(player)
+    }
+
 }
