@@ -24,7 +24,7 @@ class BedwarsMap(name: String, spawn: Location) : MiniGameMap(name, spawn, BEDWA
     val playerRespawn = mutableMapOf<Player, Location>()
     val playerColors = mutableMapOf<Player, String>()
     val playerEquipement = mutableMapOf<Player,BedwarsPlayerEquipement>()
-    private val whitelistedBlocks = mutableSetOf(Material.END_STONE, Material.OAK_PLANKS,Material.TERRACOTTA)
+    private val whitelistedBlocks = mutableSetOf(Material.END_STONE, Material.OAK_PLANKS,Material.TERRACOTTA,Material.OBSIDIAN)
     private val generators = mutableListOf<OreGenerator>()
     override fun playerLeaveArena(player: Player) {
         return
