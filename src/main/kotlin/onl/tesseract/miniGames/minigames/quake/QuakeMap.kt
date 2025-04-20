@@ -45,6 +45,9 @@ class QuakeMap(name: String, spawn: Location) : MiniGameMap(name, spawn, QUAKE) 
         }
     }
 
+    override fun getRankingDetail(player: Player): Component {
+        return Component.text(" (${playerKills[player]?:0} touche(s))", NamedTextColor.GRAY)
+    }
     override fun start() {
         super.start()
         for(p in players){
